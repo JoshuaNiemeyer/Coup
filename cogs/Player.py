@@ -11,13 +11,12 @@ class Player(commands.Cog):
         self.coins = 2
         self.cards = []
         self.isAlive = True
-
     
     @commands.command()
     async def join_game(self, ctx):
 
         #name of person calling the command
-        self.name = ctx.author.nick 
+        self.name = ctx.author.display_name 
         #randomly assign 3 cards from the deck
         self.cards = random.sample(cardList, 3)
 
@@ -27,8 +26,6 @@ class Player(commands.Cog):
 
         #open the player.json file
         with open('./data/players.json', 'r+') as f:
-
-      
 
             # Load existing data
             players = json.load(f)
@@ -41,7 +38,7 @@ class Player(commands.Cog):
             
             # Add new objects
             new_player = [
-                {"username": self.name, "coins": self.coins, "cards": self.cards}
+                {"username": self.name, "coins": self.coins, "cards": self.cards, "isAlive": True}
             ]
             
             # Extend existing data with new objects
@@ -56,14 +53,45 @@ class Player(commands.Cog):
             # Truncate any remaining data
             f.truncate()
 
+        #dm cards to player
+        await ctx.author.send(self.cards)
+
         await ctx.send(f"{self.name} has been added to the Coup game.")
 
-    
+
      
     @commands.command()
     async def collect_income(self, ctx):
-        self.coins += 1
-        await ctx.send(f"{ctx.author.nick} collected income. Total coins: {self.coins}")
+        # Open the JSON file to increment points
+        with open('./data/players.json', 'r+') as f:
+            # Load existing data
+            players = json.load(f)
+            
+            # Increment points of the first object
+         
+            found = False
+            for player in players:
+                if player['username'] == ctx.author.display_name:
+                     found = True
+                     if(player['isAlive'] == False):
+                        await send('Dead player cannot collect income.')
+                        return
+                     player['coins'] += 1
+                     self.coins = player['coins']
+
+            if(found == False):
+                await ctx.send(f'{ctx.author.display_name} has not joined the game.')
+            
+            # Go to the beginning of the file
+            f.seek(0)
+            
+            # Write updated data to file
+            json.dump(players, f, indent=4)
+            
+            # Truncate any remaining data
+            f.truncate()
+
+        await ctx.send(f"{ctx.author.display_name} collected income. Total coins: {self.coins}")
 
     @commands.command()
     async def collect_foreign_aid(self, ctx):
