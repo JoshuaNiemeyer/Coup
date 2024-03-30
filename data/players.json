@@ -1,0 +1,16 @@
+[
+    {
+        "username": " ",
+        "coins": " ",
+        "cards": " "
+    },
+    {
+        "username": "Ahnaf",
+        "coins": 2,
+        "cards": [
+            "Assasin",
+            "Duke",
+            "Contessa"
+        ]
+    }
+]
