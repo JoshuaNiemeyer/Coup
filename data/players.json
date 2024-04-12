@@ -1,0 +1,28 @@
+[
+    {
+        "username": " ",
+        "coins": " ",
+        "cards": " ",
+        "isAlive": false
+    },
+    {
+        "username": "Ahnaf",
+        "coins": 3,
+        "cards": [
+            "Ambassador",
+            "Duke",
+            "Contessa"
+        ],
+        "isAlive": true
+    },
+    {
+        "username": "Atalukd2",
+        "coins": 4,
+        "cards": [
+            "Duke",
+            "Captain",
+            "Assasin"
+        ],
+        "isAlive": true
+    }
+]
