@@ -587,9 +587,88 @@ class Player(commands.Cog):
 
             for player in players:
                 if player['username'] == ctx.author.display_name:
-                    player['cards']
 
+                    # Pull two random cards, remove them from the deck, and add them to hand
+                    firstcard = random.sample(cardList, 1)
+                    secondcard = random.sample(cardList, 1)
 
+                    # Remove the cards from the deck
+                    for card in cardList:
+                        if card == firstcard or card == secondcard:
+                            cardlist.remove(card)
+                    
+                    # Add the cards to hand
+                    player['cards'].append(firstcard)
+                    player['cards'].append(secondcard)
+
+                    self.cards = player['cards']
+
+                    await ctx.author.send(self.cards)
+
+                    # Prompt the user to react
+                    msg = await ctx.author.send(f'Choose which of your cards to return to the deck')
+
+                    await msg.add_reaction('1️⃣')
+                    await msg.add_reaction('2️⃣')
+                    await msg.add_reaction('3️⃣')
+                    
+                    if len(player['cards']) == 4:
+                        await msg.add_reaction('4️⃣')
+                    
+                    # Check the user's reaction and place the desired cards back in the deck
+                    def check(reaction, user):
+                            return user == target and str(reaction.emoji) in ['1️⃣', '2️⃣', '3️⃣', '4️⃣']
+                        try:
+                            reaction, user = await self.bot.wait_for('reaction_add', timeout = 60.0, check = check)
+                        except asyncio.TimeoutError:
+                            await ctx.send(f'No response from {target.display_name}')
+                        else: 
+                            if str(reaction.emoji) == '1️⃣':
+                                cardList.append(player['cards'].pop(0))
+
+                            elif str(reaction.emoji) == '2️⃣':
+                                cardList.append(player['cards'].pop(1))
+                            elif str(reaction.emoji) == '3️⃣':
+                                cardList.append(player['cards'].pop(2))
+                            elif str(reaction.emoji) == '4️⃣':
+                                cardList.append(player['cards'].pop(3))
+
+                    # Do it again
+                    msg = await ctx.author.send(f'Choose another card to return to the deck')
+
+                    await msg.add_reaction('1️⃣')
+                    await msg.add_reaction('2️⃣')
+                      
+                    if len(player['cards']) == 3:
+                        await msg.add_reaction('3️⃣')
+                    
+                    # Check the user's reaction and place the desired cards back in the deck
+                    def check(reaction, user):
+                            return user == target and str(reaction.emoji) in ['1️⃣', '2️⃣', '3️⃣']
+                        try:
+                            reaction, user = await self.bot.wait_for('reaction_add', timeout = 60.0, check = check)
+                        except asyncio.TimeoutError:
+                            await ctx.send(f'No response from {target.display_name}')
+                        else: 
+                            if str(reaction.emoji) == '1️⃣':
+                                cardList.append(player['cards'].pop(0))
+                            elif str(reaction.emoji) == '2️⃣':
+                                cardList.append(player['cards'].pop(1))
+                            elif str(reaction.emoji) == '3️⃣':
+                                cardList.append(player['cards'].pop(2))
+                    
+
+            # Go to the beginning of the file
+            f.seek(0)
+        
+            # Write updated data to file
+            json.dump(players, f, indent=4)
+            
+            # Truncate any remaining data
+            f.truncate()
+
+        await ctx.send(f"{ctx.author.display_name} exchanged influence cards.")
+        
 
 async def setup(bot):
 
